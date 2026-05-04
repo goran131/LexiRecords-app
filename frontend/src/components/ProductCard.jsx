@@ -1,0 +1,54 @@
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CartContext } from '../context/CartContext';
+import { apiService } from '../services/api';
+
+const ProductCard = ({ product, onDelete, isAdmin }) => {
+  const navigate = useNavigate();
+  const { addToCart } = useContext(CartContext);
+
+  const handleEdit = () => {
+    navigate(`/admin/editProduct/${product.id}`);
+  };
+
+  const openCustomPopup = (message) =>  { 
+      document.getElementById("popup-message").innerHTML = message;
+      const popup =document.getElementById("custom-popup");
+      popup.style.display = "block";
+
+      setTimeout(function() {
+        popup.style.display = 'none';
+      }, 3000); 
+  }
+
+  return (
+    <div className="card product-card">
+      <img src={product.image} alt={product.title} className="product-image" />
+      <h3 className="product-title">{product.artist } - {product.title}</h3>
+      <p className="product-description">{product.description}</p>
+      <div className="product-price">{product.price} kr</div>
+      <div className="product-stock">
+        Lager: {product.stock > 0 ? product.stock : (<strong>Slut</strong>)}
+      </div>
+      
+      <div className="product-actions">
+        {isAdmin ? (
+          <>
+            <button className="primary blue" onClick={handleEdit}>Redigera</button>
+            <button className="danger" onClick={() => onDelete(product.id)}>Ta bort</button>
+          </>
+        ) : (
+          <button
+            className = { product.stock > 0 ? ( "primary blue") : ("primary grey-disabled")} 
+            onClick = {() => {addToCart(product); 
+            openCustomPopup("Skivan har placerats i varukorgen!")}} 
+            disabled = {product.stock === 0}>
+            Lägg i varukorg
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ProductCard;
